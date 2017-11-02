@@ -1,0 +1,6 @@
+/__pycache__
+/.idea
+/*.db
+/s4399/__pycache__
+/s4399/spiders/__pycache__
+/douban.json
