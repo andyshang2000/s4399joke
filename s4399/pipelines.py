@@ -7,17 +7,25 @@
 
 import json
 import codecs
-
-from s4399.db.database import session, dbJokeItem
+from s4399.items import WallpaperItem, JokeItem
+import s4399.db.wallpaper as wall
+import s4399.db.database as joke
 
 class S4399Pipeline(object):
     def __init__(self):
         self.file = codecs.open('douban.json', 'w', encoding='utf-8')
 
     def process_item(self, item, spider):
-        dbItem = dbJokeItem(item)
-        session.add(dbItem)
-        session.commit()
+        if isinstance(item, JokeItem):
+            dbItem = joke.dbJokeItem(item)
+            joke.session.add(dbItem)
+            joke.session.commit()
+        elif isinstance(item, WallpaperItem):
+            dbItem = wall.dbWallpaper(item)
+            tag = wall.Tag(item)
+            wall.session.merge(dbItem)
+            wall.session.merge(tag)
+            wall.session.commit()
         return item
 
     def spider_closed(self, spider):
