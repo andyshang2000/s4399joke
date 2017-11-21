@@ -7,8 +7,9 @@
 
 import json
 import codecs
-from s4399.items import WallpaperItem, JokeItem
+from s4399.items import WallpaperItem, JokeItem, A3987Group, A3987Error
 import s4399.db.wallpaper as wall
+import s4399.db.wall3987 as w3987
 import s4399.db.database as joke
 
 class S4399Pipeline(object):
@@ -26,6 +27,37 @@ class S4399Pipeline(object):
             wall.session.merge(dbItem)
             wall.session.merge(tag)
             wall.session.commit()
+        elif isinstance(item, A3987Error):
+            e = w3987.Error()
+            e.id = item['url']
+            w3987.session.merge(e)
+            w3987.session.commit()
+        elif isinstance(item, A3987Group):
+            g = w3987.Group()
+            g.id = item['id']
+            g.thumb = item['thumb']
+            g.count = item['view_count']
+            g.title = item['title']
+            g.cat = item['cat']
+
+            for tag in item['tags']:
+                t = w3987.Tag()
+                t.group = item['id']
+                t.name = tag
+                t.id = g.id + tag
+                w3987.session.merge(t)
+
+            c = 1
+            for image in item['images']:
+                img = w3987.Image()
+                img.url = image
+                img.group = item['id']
+                img.id = item['id'] + "_" + str(c)
+                c += 1
+                w3987.session.merge(img)
+
+            w3987.session.merge(g)
+            w3987.session.commit()
         return item
 
     def spider_closed(self, spider):

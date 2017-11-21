@@ -4,7 +4,7 @@
 from scrapy import cmdline
 import sys
 
-name = 'bing_wallpaper'
+name = '3987'
 if len(sys.argv) > 1:
     name = sys.argv[1]
 cmd = 'scrapy crawl {0}'.format(name)
